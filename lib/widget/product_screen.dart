@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gagro/Constent/constant.dart';
 import 'package:gagro/Product_List/product_list_model.dart';
+import 'package:gagro/screens/product_details.dart';
 import 'package:http/http.dart' as http;
 
 class ProductScreen extends StatefulWidget {
@@ -63,14 +64,14 @@ class _ProductScreenState extends State<ProductScreen> {
                   ),
                   IconButton(
                       icon: Icon(
-                        FontAwesomeIcons.sortAlphaDown,
+                        Icons.filter_list,
                         color: Colors.black87,
-                        size: 15,
+                        size: 20,
                       ),
                       onPressed: null),
                   IconButton(
                       icon: Icon(
-                        Icons.menu,
+                        Icons.format_align_left,
                         color: Colors.black87,
                         size: 20,
                       ),
@@ -110,149 +111,161 @@ class _ProductScreenState extends State<ProductScreen> {
               itemBuilder: (context, index) {
                 return Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    height: 220,
-                    width: 190,
-                    decoration: BoxDecoration(
-                      color: white,
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.grey[300],
-                            offset: Offset(1, 1),
-                            blurRadius: 4),
-                      ],
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Stack(
-                          children: [
-                            Expanded(
-                              child: Container(
-                                margin: EdgeInsets.only(left: 20),
-                                child: CachedNetworkImage(
-                                  imageUrl: dataList[index].image1,
-                                  height: 100,
-                                  width: 100,
-                                  fit: BoxFit.fill,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ProductDetailsScreen(
+                                    productObject: dataList[index],
+                                  )));
+                      debugPrint('$dataList[index]');
+                    },
+                    child: Container(
+                      height: 220,
+                      width: 190,
+                      decoration: BoxDecoration(
+                        color: white,
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.grey[300],
+                              offset: Offset(1, 1),
+                              blurRadius: 4),
+                        ],
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Stack(
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  margin: EdgeInsets.only(left: 20),
+                                  child: CachedNetworkImage(
+                                    imageUrl: dataList[index].image1,
+                                    height: 100,
+                                    width: 100,
+                                    fit: BoxFit.fill,
+                                  ),
                                 ),
                               ),
-                            ),
-                            Positioned(
-                              child: Container(
-                                padding: EdgeInsets.all(10),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Icon(
-                                      Icons.offline_bolt,
+                              Positioned(
+                                child: Container(
+                                  padding: EdgeInsets.all(10),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Icon(
+                                        Icons.radio_button_checked,
+                                        size: 20,
+                                        color: Colors.greenAccent,
+                                      ),
+                                      Text(
+                                        dataList[index].quantity.toString(),
+                                        style: TextStyle(
+                                            fontSize: 15,
+                                            color: Colors.black54,
+                                            fontWeight: FontWeight.w600),
+                                        softWrap: true,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                width: MediaQuery.of(context).size.width / 4,
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  "${dataList[index].name}",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                  ),
+                                  softWrap: true,
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.all(8),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    color: white,
+                                    boxShadow: [
+                                      BoxShadow(
+                                          color: Colors.grey[300],
+                                          offset: Offset(1, 1),
+                                          blurRadius: 4),
+                                    ],
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Icon(
+                                      Icons.favorite_border,
                                       size: 20,
-                                      color: Colors.greenAccent,
+                                      color: red,
                                     ),
-                                    Text(
-                                      "1 KG",
-                                      style: TextStyle(
-                                          fontSize: 15,
-                                          color: Colors.black54,
-                                          fontWeight: FontWeight.w600),
-                                      softWrap: true,
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 8.0),
+                                    child: Text(
+                                      "4.7",
+                                      style:
+                                          TextStyle(fontSize: 18, color: grey),
                                     ),
-                                  ],
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width / 4,
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                "${dataList[index].name}",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                ),
-                                softWrap: true,
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.all(8),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20),
-                                  color: white,
-                                  boxShadow: [
-                                    BoxShadow(
-                                        color: Colors.grey[300],
-                                        offset: Offset(1, 1),
-                                        blurRadius: 4),
-                                  ],
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Icon(
-                                    Icons.favorite_border,
-                                    size: 20,
+                                  ),
+                                  SizedBox(
+                                    width: 2,
+                                  ),
+                                  Icon(
+                                    Icons.star,
                                     color: red,
+                                    size: 16,
                                   ),
+                                  Icon(
+                                    Icons.star,
+                                    color: red,
+                                    size: 16,
+                                  ),
+                                  Icon(
+                                    Icons.star,
+                                    color: red,
+                                    size: 16,
+                                  ),
+                                  Icon(
+                                    Icons.star,
+                                    color: red,
+                                    size: 16,
+                                  ),
+                                ],
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(right: 8.0),
+                                child: Text(
+                                  "${dataList[index].originalPrice}",
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      color: grey,
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ),
-                            )
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 8.0),
-                                  child: Text(
-                                    "4.7",
-                                    style: TextStyle(fontSize: 18, color: grey),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 2,
-                                ),
-                                Icon(
-                                  Icons.star,
-                                  color: red,
-                                  size: 16,
-                                ),
-                                Icon(
-                                  Icons.star,
-                                  color: red,
-                                  size: 16,
-                                ),
-                                Icon(
-                                  Icons.star,
-                                  color: red,
-                                  size: 16,
-                                ),
-                                Icon(
-                                  Icons.star,
-                                  color: red,
-                                  size: 16,
-                                ),
-                              ],
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(right: 8.0),
-                              child: Text(
-                                "${dataList[index].originalPrice}",
-                                style: TextStyle(
-                                    fontSize: 20,
-                                    color: grey,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 );
