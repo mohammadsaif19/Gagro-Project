@@ -9,6 +9,7 @@ import 'package:gagro/Product_List/product_list.dart';
 import 'package:gagro/Product_model/category_subcategory.dart';
 import 'package:gagro/Profile/profile.dart';
 import 'package:gagro/category_page1/page1.dart';
+import 'package:gagro/widget/custom_drawer.dart';
 import 'package:gagro/widget/product_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -99,7 +100,7 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomBar(),
-      drawer: Drawer(),
+      drawer: CustomDrawer(),
       body: ListView(
         children: <Widget>[
           Card(
