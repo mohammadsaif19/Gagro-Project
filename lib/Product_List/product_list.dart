@@ -55,11 +55,15 @@ class _ProductListState extends State<ProductList> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Padding(
+                            Container(
+                              width: MediaQuery.of(context).size.width / 4,
                               padding: const EdgeInsets.all(8.0),
                               child: Text(
                                 "${dataList[index].name}",
-                                style: TextStyle(fontSize: 20),
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+                                softWrap: true,
                               ),
                             ),
                             Padding(
@@ -87,55 +91,6 @@ class _ProductListState extends State<ProductList> {
                             )
                           ],
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 8.0),
-                                  child: Text(
-                                    "4.7",
-                                    style: TextStyle(fontSize: 18, color: grey),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 2,
-                                ),
-                                Icon(
-                                  Icons.star,
-                                  color: red,
-                                  size: 16,
-                                ),
-                                Icon(
-                                  Icons.star,
-                                  color: red,
-                                  size: 16,
-                                ),
-                                Icon(
-                                  Icons.star,
-                                  color: red,
-                                  size: 16,
-                                ),
-                                Icon(
-                                  Icons.star,
-                                  color: red,
-                                  size: 16,
-                                ),
-                              ],
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(right: 8.0),
-                              child: Text(
-                                "${dataList[index].originalPrice}",
-                                style: TextStyle(
-                                    fontSize: 20,
-                                    color: grey,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ],
-                        ),
                       ],
                     ),
                   ),
@@ -160,9 +115,11 @@ Future<Catalog> fetchGagro() async {
   final response = await http.get(
       'http://uat.gagro.com.bd/api/product-data'); // ?fbclid=IwAR1vj83qPGT3nu-fT8OFT5CU5N3pZOWspDVSrRvU7Q2H-pRB6oIHP2bWkOk
 
-  if (response.statusCode == 200) {
-    return Catalog.fromJson(json.decode(response.body));
-  } else {
-    throw Exception('Failed to load album');
+  try {} catch (e) {
+    if (response.statusCode == 200) {
+      return Catalog.fromJson(json.decode(response.body));
+    } else {
+      throw Exception('Failed to load album');
+    }
   }
 }

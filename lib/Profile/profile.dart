@@ -3,15 +3,11 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gagro/Api/api.dart';
-import 'package:gagro/Login/login.dart';
-import 'package:gagro/Profile/profile_model.dart';
-import 'package:gagro/Profile/profileupdate.dart';
 import 'package:gagro/global/global.dart';
 import 'package:http/http.dart' as http;
-import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'profile_model.dart';
+
+import 'profile_update.dart';
 
 class ProfileGet extends StatefulWidget {
   @override
@@ -26,21 +22,27 @@ class _ProfileGetState extends State<ProfileGet> {
     final response = await http.get(BaseURL.profileUpdate,
         headers: {HttpHeaders.authorizationHeader: "Bearer $token"});
 
-    Map user = json.decode(response.body);
-    
-    debugPrint('$user');
-  }
-
-//  signOut() async {
-//    SharedPreferences _preference = await SharedPreferences.getInstance();
-//    await _preference.clear();
-//    Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
-//  }
-
-  signOut() async {
-    SharedPreferences _preference = await SharedPreferences.getInstance();
-    await _preference.clear();
-    Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
+    Map userdecode = json.decode(response.body);
+    if (userdecode["Success"]) {
+      Map user = userdecode["data"]["data_list"];
+      addressController.text = user["address"];
+      occuptionController.text = user["occupation"];
+      educationController.text = user["education"];
+      dobController.text = user["dob"];
+      upazilaController.text = user["upazila"];
+      setState(() {
+        USERNAME = user["name"];
+        EMAIL = user["email"];
+        PHONE = user["phone"];
+        ADDRESS = user["address"];
+        OCCUPTION = user["occupation"];
+        EDUCATION = user["education"];
+        DOB = user["dob"];
+        UPAZILA = user["upazila"];
+      });
+    }
+    //var p = user["name"];
+    // debugPrint('$user');
   }
 
   final addressController = TextEditingController();
@@ -52,310 +54,172 @@ class _ProfileGetState extends State<ProfileGet> {
   @override
   void initState() {
     super.initState();
-    addressController.text = ADDRESS;
-    occuptionController.text = OCCUPTION;
-    educationController.text = EDUCATION;
-    dobController.text = DOB;
-    upazilaController.text = UPAZILA;
+    fetchData();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-//      appBar: AppBar(
-//        backgroundColor: Colors.purple,
-//        actions: <Widget>[
-//          FlatButton.icon(
-//            onPressed: () {
-//              Navigator.push(context,
-//                  MaterialPageRoute(builder: (context) => ProfileUpdate()));
-//            },
-//            icon: Icon(
-//              Icons.edit,
-//              color: Colors.white,
-//            ),
-//            label: Text(
-//              "Edit Profile",
-//              style: TextStyle(
-//                  fontSize: 16,
-//                  fontWeight: FontWeight.bold,
-//                  color: Colors.white),
-//            ),
-//          ),
-//        ],
-//      ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Container(
-              padding: EdgeInsets.only(top: 60, right: 20, left: 20, bottom: 5),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Row(
+      appBar: AppBar(
+        backgroundColor: Colors.deepPurple,
+        actions: <Widget>[
+          FlatButton.icon(
+            onPressed: () async {
+              bool update = false;
+              update = await Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ProfileUpdate()));
+              if (update) {
+                fetchData();
+              }
+            },
+            icon: Icon(
+              Icons.edit,
+              color: Colors.black,
+            ),
+            label: Text(
+              "Edit Profile",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(15.0),
+        child: ListView(
+          children: <Widget>[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(50),
+              child: Card(
+                elevation: 1,
+                child: Container(
+                  height: 250,
+                  width: 200,
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black),
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                              image: AssetImage('assets/images/man.png'),
-                              fit: BoxFit.fill),
-                        ),
-                      ),
-                      FlatButton.icon(
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ProfileUpdate()));
-                        },
-                        icon: Icon(
-                          Icons.edit,
-                          color: Colors.black,
-                        ),
-                        label: Text(
-                          "Edit Profile",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: GestureDetector(
+                          onTap: () {
+                            print("Abir");
+                          },
+                          child: Container(
+                            width: 100,
+                            height: 100,
+                            decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                  fit: BoxFit.fill,
+                                  image: NetworkImage(
+                                      "https://png.pngtree.com/png-clipart/20190614/original/pngtree-man-vector-icon-png-image_3791374.jpg"),
+                                )),
                           ),
                         ),
                       ),
+                      SizedBox(
+                        height: 8,
+                      ),
+                      Text(
+                        "Name: $USERNAME",
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(
+                        height: 8,
+                      ),
+                      SizedBox(
+                        height: 13,
+                      ),
+                      Text(
+                        "Name: $PHONE",
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
                     ],
                   ),
-
-                  SizedBox(
-                    height: 20,
-                  ),
-
-                  Text(
-                    "Name: $EMAIL",
-                    style: TextStyle(fontSize: 20),
-                  ),
-
-                  SizedBox(
-                    height: 20,
-                  ),
-
-                  Text(
-                    "Email:  $EMAIL",
-                    style: TextStyle(fontSize: 18),
-                  ),
-
-                  SizedBox(
-                    height: 20,
-                  ),
-
-                  Text(
-                    "Phone:  $PHONE",
-                    style: TextStyle(fontSize: 18),
-                  ),
-
-                  SizedBox(
-                    height: 20,
-                  ),
-
-//                  TextFormField(
-//                    controller: dobController,
-//                    decoration: InputDecoration(hintText: "Dob"),
-//                  ),
-
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20, right: 20),
-                    child: TextFormField(
-                      controller: dobController,
-                      decoration: InputDecoration(
-                          enabledBorder: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(8)),
-                              borderSide: BorderSide(color: Colors.grey[200])),
-                          focusedBorder: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(8)),
-                              borderSide: BorderSide(color: Colors.grey[300])),
-                          filled: true,
-                          fillColor: Colors.grey[100],
-                          hintText: "Dob"),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 20.0,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20, right: 20),
-                    child: TextFormField(
-                      controller: occuptionController,
-                      decoration: InputDecoration(
-                          enabledBorder: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(8)),
-                              borderSide: BorderSide(color: Colors.grey[200])),
-                          focusedBorder: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(8)),
-                              borderSide: BorderSide(color: Colors.grey[300])),
-                          filled: true,
-                          fillColor: Colors.grey[100],
-                          hintText: "Occuption"),
-                    ),
-                  ),
-
-                  SizedBox(
-                    height: 20,
-                  ),
-
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20, right: 20),
-                    child: TextFormField(
-                      controller: educationController,
-                      decoration: InputDecoration(
-                          enabledBorder: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(8)),
-                              borderSide: BorderSide(color: Colors.grey[200])),
-                          focusedBorder: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(8)),
-                              borderSide: BorderSide(color: Colors.grey[300])),
-                          filled: true,
-                          fillColor: Colors.grey[100],
-                          hintText: "Education"),
-                    ),
-                  ),
-
-//                  TextFormField(
-//                    controller: occuptionController,
-//                    decoration: InputDecoration(hintText: " Occuption"),
-//                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20, right: 20),
-                    child: TextFormField(
-                      controller: addressController,
-                      decoration: InputDecoration(
-                          enabledBorder: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(8)),
-                              borderSide: BorderSide(color: Colors.grey[200])),
-                          focusedBorder: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(8)),
-                              borderSide: BorderSide(color: Colors.grey[300])),
-                          filled: true,
-                          fillColor: Colors.grey[100],
-                          hintText: "Address"),
-                    ),
-                  ),
-
-//                  TextFormField(
-//                    controller: educationController,
-//                    decoration: InputDecoration(hintText: " Education"),
-//                  ),
-
-//                  TextFormField(
-//                    controller: addressController,
-//                    decoration: InputDecoration(hintText: "Address"),
-//                  ),
-
-                  // fetchData();
-
-//                  Padding(
-//                    padding:
-//                        const EdgeInsets.only(left: 80, right: 80, top: 10),
-//                    child: Container(
-//                      height: 45,
-//                      width: 230,
-//                      child: RaisedButton(
-//                        onPressed: () {
-//                          signOut();
-//                        },
-//                        color: Colors.deepPurple,
-//                        child: Text(
-//                          "LogOut",
-//                          style: TextStyle(fontSize: 15, color: Colors.white),
-//                        ),
-//                        shape: RoundedRectangleBorder(
-//                          borderRadius: BorderRadius.circular(20),
-//                        ),
-//                      ),
-//                    ),
-//                  ),
-
-//              FutureBuilder(
-//                  future: fetchData(),
-//                  builder: (_, snapshot) {
-//                    if (snapshot.hasData) {
-//                      Gagro user = snapshot.data;
-//                      return Container(
-//                        child: Column(
-//                          mainAxisAlignment: MainAxisAlignment.center,
-//                          children: [
-//                            Container(
-//                              width: 150,
-//                              height: 150,
-//                              decoration: BoxDecoration(
-//                                shape: BoxShape.circle,
-//                                image: DecorationImage(
-//                                    image: AssetImage('assets/images/man.png'),
-//                                    fit: BoxFit.fill),
-//                              ),
-//                            ),
-//                            SizedBox(
-//                              height: 30,
-//                            ),
-//                            ListTile(title: Text("Name:  " + USERNAME)),
-//                            ListTile(
-//                                title: Text(
-//                                    "Phone:  " + user.data.dataList.phone)),
-//                            ListTile(
-//                                title: Text("Education:  " +
-//                                    user.data.dataList.education)),
-//                            SizedBox(
-//                              height: 30,
-//                            ),
-//
-//                            Padding(
-//                              padding: const EdgeInsets.all(30.0),
-//                              child: Container(
-//                                height: 45,
-//                                width: 230,
-//                                child: RaisedButton(
-//                                  onPressed: () {
-//                                    signOut();
-//                                  },
-//                                  color: Colors.deepPurple,
-//                                  child: Text(
-//                                    "LogOut",
-//                                    style: TextStyle(
-//                                        fontSize: 15, color: Colors.white),
-//                                  ),
-//                                  shape: RoundedRectangleBorder(
-//                                    borderRadius: BorderRadius.circular(20),
-//                                  ),
-//                                ),
-//                              ),
-//                            ),
-//                          ],
-//                        ),
-//                      );
-//                    } else {
-//                      return Center(
-//                          child: Column(
-//                        mainAxisAlignment: MainAxisAlignment.center,
-//                        children: [
-//                          CircularProgressIndicator(),
-//                        ],
-//                      ));
-//                    }
-//                  })
-                ],
-              )),
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 30, right: 30),
+              child: TextFormField(
+                controller: educationController,
+                decoration: InputDecoration(
+                    enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                        borderSide: BorderSide(color: Colors.grey[200])),
+                    focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                        borderSide: BorderSide(color: Colors.grey[300])),
+                    filled: true,
+                    fillColor: Colors.grey[100],
+                    hintText: "Upazila_Id"),
+              ),
+            ),
+            SizedBox(
+              height: 30,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 30, right: 30),
+              child: TextFormField(
+                controller: educationController,
+                decoration: InputDecoration(
+                    enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                        borderSide: BorderSide(color: Colors.grey[200])),
+                    focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                        borderSide: BorderSide(color: Colors.grey[300])),
+                    filled: true,
+                    fillColor: Colors.grey[100],
+                    hintText: "Address"),
+              ),
+            ),
+            SizedBox(
+              height: 30,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 30, right: 30),
+              child: TextFormField(
+                controller: educationController,
+                decoration: InputDecoration(
+                    enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                        borderSide: BorderSide(color: Colors.grey[200])),
+                    focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                        borderSide: BorderSide(color: Colors.grey[300])),
+                    filled: true,
+                    fillColor: Colors.grey[100],
+                    hintText: "Occuption"),
+              ),
+            ),
+            SizedBox(
+              height: 30,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 30, right: 30, bottom: 30),
+              child: TextFormField(
+                controller: educationController,
+                decoration: InputDecoration(
+                    enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                        borderSide: BorderSide(color: Colors.grey[200])),
+                    focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                        borderSide: BorderSide(color: Colors.grey[300])),
+                    filled: true,
+                    fillColor: Colors.grey[100],
+                    hintText: "Education"),
+              ),
+            ),
+          ],
         ),
       ),
     );

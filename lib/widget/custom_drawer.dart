@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:gagro/global/global.dart';
 
 class CustomDrawer extends StatefulWidget {
   CustomDrawer({Key key}) : super(key: key);
@@ -17,7 +18,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
           UserAccountsDrawerHeader(
               decoration: BoxDecoration(color: Colors.deepOrange),
               accountName: Text(
-                "Mohammad Saif",
+                "$USERNAME",
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: 15,
@@ -31,7 +32,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   borderRadius: BorderRadius.circular(50),
                   child: CachedNetworkImage(
                     imageUrl:
-                        'https://images.assetsdelivery.com/compings_v2/gmast3r/gmast3r1506/gmast3r150600130.jpg',
+                        'http://uat.gagro.com.bd/gagro/img/logo/logo01.png',
                     fit: BoxFit.fill,
                   ),
                 ),

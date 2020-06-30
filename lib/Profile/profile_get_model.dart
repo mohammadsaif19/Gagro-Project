@@ -56,7 +56,6 @@ class DataList {
   DataList({
     this.id,
     this.name,
-    this.email,
     this.dob,
     this.gender,
     this.occupation,
@@ -71,7 +70,6 @@ class DataList {
 
   int id;
   String name;
-  String email;
   dynamic dob;
   String gender;
   dynamic occupation;
@@ -86,7 +84,6 @@ class DataList {
   factory DataList.fromJson(Map<String, dynamic> json) => DataList(
         id: json["id"],
         name: json["name"],
-        email: json["email"],
         dob: json["dob"],
         gender: json["gender"],
         occupation: json["occupation"],
@@ -102,7 +99,6 @@ class DataList {
   Map<String, dynamic> toJson() => {
         "id": id,
         "name": name,
-        "email": email,
         "dob": dob,
         "gender": gender,
         "occupation": occupation,

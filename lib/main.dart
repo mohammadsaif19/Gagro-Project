@@ -12,8 +12,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.deepOrange,
-        primaryColor: Colors.deepOrange,
         textTheme: GoogleFonts.latoTextTheme(Theme.of(context).textTheme),
       ),
       home: Login(),

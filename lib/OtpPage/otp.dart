@@ -4,7 +4,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gagro/Api/api.dart';
 import 'package:gagro/Home/home.dart';
 import 'package:gagro/Login/login.dart';
-import 'package:gagro/global/global.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -23,8 +22,8 @@ class _OtpPageState extends State<OtpPage> {
   TextEditingController otp = TextEditingController();
   TextEditingController email = TextEditingController();
   loginWithotp(String otp, String email) async {
-    var response =
-        await http.post(BaseURL.userVeri, body: {"email": widget.phoneNumber, "code": otp});
+    var response = await http.post(BaseURL.userVeri,
+        body: {"email": widget.phoneNumber, "code": otp});
     Map user = json.decode(response.body);
     if (user['data']['access_token'] != null) {
       print(user['data']['access_token']);

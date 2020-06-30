@@ -1,77 +1,77 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:carousel_pro/carousel_pro.dart';
 import 'package:flutter/material.dart';
 import 'package:gagro/Product_List/product_list_model.dart';
+import 'package:html/parser.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   final DataList productObject;
 
-  ProductDetailsScreen({Key key, this.productObject}) : super(key: key);
-
+  const ProductDetailsScreen({Key key, this.productObject}) : super(key: key);
   @override
   _ProductDetailsScreenState createState() => _ProductDetailsScreenState();
 }
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
+  bool _addCartClicked = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
         centerTitle: true,
-        backgroundColor: Colors.deepOrange,
-        title: Text(widget.productObject.name),
-      ),
-      bottomNavigationBar: _customBottomBar(),
-      body: DetailScreen(
-        productObject: widget.productObject,
-      ),
-    );
-  }
-
-  Widget _customBottomBar() {
-    return Container(
-      child: Row(
-        children: <Widget>[
-          Container(
-            width: MediaQuery.of(context).size.width / 2,
-            child: RaisedButton(
-              elevation: 0,
-              shape: new RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.only(
-                      topLeft: Radius.circular(10),
-                      bottomLeft: Radius.circular(10)),
-                  side: BorderSide(color: Color(0xFFfef2f2))),
-              onPressed: () {},
-              color: Color(0xFFfef2f2),
-              textColor: Colors.white,
-              child: Container(
-                padding: EdgeInsets.only(top: 15, bottom: 15),
-                child: Text("Add to Wishlist".toUpperCase(),
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xFFff665e))),
-              ),
-            ),
+        backgroundColor: Colors.orange[200],
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios,
+            color: Colors.black54,
           ),
-          Container(
-            width: MediaQuery.of(context).size.width / 2,
-            child: RaisedButton(
-              elevation: 0,
-              onPressed: () {},
-              color: Color(0xFFff665e),
-              textColor: Colors.white,
-              child: Container(
-                padding:
-                    EdgeInsets.only(left: 5, right: 5, top: 15, bottom: 15),
-                child: Text("Add To Cart".toUpperCase(),
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xFFFFFFFF))),
-              ),
+          onPressed: () => Navigator.pop(context),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.add_shopping_cart,
+              color: Colors.black54,
             ),
+            onPressed: () => Navigator.pop(context),
           ),
         ],
+      ),
+      body: SingleChildScrollView(
+        child: DetailScreen(
+          productObject: widget.productObject,
+        ),
+      ),
+      bottomNavigationBar: Container(
+        height: 60,
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        child: RaisedButton(
+          elevation: 0,
+          color: _addCartClicked ? Colors.orange : Colors.orange[200],
+          shape: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: _addCartClicked ? Colors.orange : Colors.orange[200],
+            ),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          onPressed: () {
+            setState(() {
+              _addCartClicked = true;
+            });
+          },
+          child: Text(
+            _addCartClicked
+                ? "Added To Cart".toUpperCase()
+                : "Add To Cart".toUpperCase(),
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: _addCartClicked ? Colors.white : Colors.black,
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -79,164 +79,256 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
 class DetailScreen extends StatefulWidget {
   final DataList productObject;
-
-  DetailScreen({Key key, this.productObject}) : super(key: key);
+  DetailScreen({
+    Key key,
+    this.productObject,
+  }) : super(key: key);
 
   @override
   _DetailScreenState createState() => _DetailScreenState();
 }
 
 class _DetailScreenState extends State<DetailScreen> {
+  int _counter = 0;
+  bool _addCartClicked = false;
+
+  void _increaseCartItem() {
+    setState(() {
+      _counter++;
+    });
+  }
+
+  void _decreaseCartItem() {
+    if (_counter < 1) {
+      return null;
+    } else {
+      setState(() {
+        _counter--;
+      });
+    }
+  }
+
+  static removeTag({htmlString, callback}) {
+    var document = parse(htmlString);
+    String parsedString = parse(document.body.text).documentElement.text;
+    callback(parsedString);
+    return parsedString;
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
+          Container(
+            height: 200,
+            child: Stack(
+              children: [
+                Container(
+                  height: 150,
+                  decoration: BoxDecoration(
+                      color: Colors.orange[200],
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(40),
+                        bottomRight: Radius.circular(40),
+                      )),
+                ),
+                Positioned(
+                  child: DetailsImageSlider(
+                    productObject: widget.productObject,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.only(left: 20),
+            alignment: Alignment.topLeft,
+            child: Text(widget.productObject.name,
+                style: TextStyle(
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black)),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Container(
+            padding: EdgeInsets.only(left: 20),
+            alignment: Alignment.topLeft,
+            child: Text("Each (500g - 700g)",
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black54)),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Container(
+            padding: EdgeInsets.only(left: 20),
+            alignment: Alignment.topLeft,
+            child: Text(
+                widget.productObject.description == null
+                    ? "Description not available for this product"
+                    : removeTag(
+                        htmlString: widget.productObject.description,
+                        callback: (string) => print(string),
+                      ),
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w300,
+                    color: Colors.black38)),
+          ),
           SizedBox(
             height: 20,
           ),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: CachedNetworkImage(
-              imageUrl: widget.productObject.image1,
-              fit: BoxFit.fill,
-              height: 200,
-              width: 300,
-            ),
-          ),
           SizedBox(
             height: 10,
           ),
-          Container(
-            padding: EdgeInsets.only(left: 15, right: 15, top: 20, bottom: 20),
-            color: Color(0xFFFFFFFF),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text("SKU".toUpperCase(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.only(left: 20),
+                    alignment: Alignment.topLeft,
+                    child: Text("৳ ${widget.productObject.originalPrice}",
+                        style: TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black)),
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(left: 5),
+                    alignment: Alignment.topLeft,
+                    child: Text(
+                      widget.productObject.price != null
+                          ? "৳ ${widget.productObject.price}"
+                          : "",
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black38,
+                        decoration: TextDecoration.lineThrough,
+                        decorationStyle: TextDecorationStyle.solid,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: () => _decreaseCartItem(),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5.0),
+                          border: Border.all(color: Colors.grey)),
+                      child: Icon(
+                        Icons.remove,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Text(
+                    "$_counter",
                     style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF565656))),
-                Text(widget.productObject.sku,
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFFfd0100))),
-                Icon(
-                  Icons.arrow_forward_ios,
-                  color: Color(0xFF999999),
-                )
-              ],
-            ),
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  GestureDetector(
+                    onTap: () => _increaseCartItem(),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5.0),
+                          border: Border.all(color: Colors.grey)),
+                      child: Icon(
+                        Icons.add,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 20,
+                  )
+                ],
+              )
+            ],
           ),
           SizedBox(
-            height: 10,
+            height: 50,
           ),
-          Container(
-            padding: EdgeInsets.only(left: 15, right: 15, top: 20, bottom: 20),
-            color: Color(0xFFFFFFFF),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text("Price".toUpperCase(),
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF565656))),
-                Text("৳ ${widget.productObject.originalPrice}".toUpperCase(),
-                    style: TextStyle(
-                        color: Color(0xFF0dc2cd),
-                        fontFamily: 'Roboto-Light.ttf',
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500)),
-              ],
-            ),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Container(
-            alignment: Alignment.topLeft,
-            width: double.infinity,
-            padding: EdgeInsets.only(left: 15, right: 15, top: 20, bottom: 20),
-            color: Color(0xFFFFFFFF),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text("Description",
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF565656))),
-                SizedBox(
-                  height: 15,
-                ),
-                Text("${widget.productObject.description}",
-                    textAlign: TextAlign.justify,
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xFF4c4c4c))),
-              ],
-            ),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Container(
-            alignment: Alignment.topLeft,
-            width: double.infinity,
-            padding: EdgeInsets.only(left: 15, right: 15, top: 20, bottom: 20),
-            color: Color(0xFFFFFFFF),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text("Specification",
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF565656))),
-                SizedBox(
-                  height: 15,
-                ),
-              ],
-            ),
-          )
         ],
       ),
     );
   }
+}
 
-  // List<Widget> generateProductSpecification(BuildContext context) {
-  //   List<Widget> list = [];
-  //   int count = 0;
-  //   widget.productObject..forEach((specification) {
-  //     Widget element = Container(
-  //       height: 30,
-  //       child: Row(
-  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //         children: <Widget>[
-  //           Text(specification.specificationName,
-  //               textAlign: TextAlign.left,
-  //               style: TextStyle(
-  //                   fontSize: 14,
-  //                   fontWeight: FontWeight.w400,
-  //                   color: Color(0xFF444444))),
-  //           Text(specification.specificationValue,
-  //               textAlign: TextAlign.left,
-  //               style: TextStyle(
-  //                   fontSize: 14,
-  //                   fontWeight: FontWeight.w400,
-  //                   color: Color(0xFF212121))),
-  //         ],
-  //       ),
-  //     );
-  //     list.add(element);
-  //     count++;
-  //   });
-  //   return list;
-  // }
+class DetailsImageSlider extends StatefulWidget {
+  final DataList productObject;
+
+  const DetailsImageSlider({Key key, this.productObject}) : super(key: key);
+  @override
+  _DetailsImageSliderState createState() => _DetailsImageSliderState();
+}
+
+class _DetailsImageSliderState extends State<DetailsImageSlider>
+    with TickerProviderStateMixin {
+  Animation<double> animation;
+  AnimationController controller;
+
+  initState() {
+    super.initState();
+    controller = new AnimationController(
+        duration: const Duration(milliseconds: 2000), vsync: this);
+    animation = new Tween(begin: 0.0, end: 18.0).animate(controller)
+      ..addListener(() {
+        setState(() {});
+      });
+    controller.forward();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 150.0,
+      child: ClipRRect(
+          borderRadius: BorderRadius.circular(8.0),
+          child: Carousel(
+            boxFit: BoxFit.fill,
+            images: [
+              CachedNetworkImage(imageUrl: widget.productObject.image1),
+              CachedNetworkImage(imageUrl: widget.productObject.image2),
+            ],
+            animationCurve: Curves.fastOutSlowIn,
+            animationDuration: Duration(seconds: 1),
+            autoplayDuration: Duration(seconds: 3),
+            dotSize: 4.0,
+            dotIncreasedColor: Colors.orange[200],
+            dotColor: Colors.orange,
+            dotSpacing: 10.0,
+            indicatorBgPadding: 5.0,
+            dotBgColor: Colors.transparent,
+            borderRadius: true,
+            moveIndicatorFromBottom: 180.0,
+            noRadiusForIndicator: true,
+          )),
+    );
+  }
+
+  dispose() {
+    controller.dispose();
+    super.dispose();
+  }
 }

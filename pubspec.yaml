@@ -46,6 +46,9 @@ dependencies:
   cached_network_image: ^2.2.0+1
   flutter_rating: ^0.0.2
   auto_size_text: ^2.1.0
+  html: ^0.14.0+3
+
+  
 
 dev_dependencies:
   flutter_test:
@@ -66,6 +69,8 @@ flutter:
   assets:
      - assets/images/man.png
      - assets/images/logo.png
+     - assets/images/1.jpg
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
@@ -78,10 +83,10 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
+  fonts:
+    - family: Bengali
+      fonts:
+        - asset: assets/fonts/AmarBanglaBold.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro

@@ -122,7 +122,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 title: TextField(
                   decoration: InputDecoration(
-                      border: InputBorder.none, hintText: "Find a product.."),
+                      border: InputBorder.none, hintText: "Search  product.."),
                 ),
                 trailing: Icon(
                   Icons.filter_list,
@@ -148,14 +148,14 @@ class _HomePageState extends State<HomePage> {
           ),
 
           Container(
-            height: 120,
+            height: 150,
             child: FutureBuilder(
               future: fetchGagro(),
               builder: (BuildContext context, AsyncSnapshot<Gagro> snapshot) {
                 if (snapshot.hasData) {
                   final dataList = snapshot.data.data.dataList;
                   return Container(
-                    height: 250,
+                    height: 300,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemCount: dataList.length,
@@ -164,30 +164,35 @@ class _HomePageState extends State<HomePage> {
                           padding: const EdgeInsets.all(8.0),
                           child: Column(
                             children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: white,
-                                  boxShadow: [
-                                    BoxShadow(
-                                        color: Colors.grey[300],
-                                        offset: Offset(1, 1),
-                                        blurRadius: 4),
-                                  ],
-                                ),
-                                child: Padding(
-                                  padding: EdgeInsets.all(4),
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => Page1(
-                                                dataList[index].childList)),
-                                      );
-                                    },
-                                    child: Image.network(
-                                      dataList[index].image,
-                                      width: 40,
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(35),
+                                child: Container(
+                                  height: 80,
+                                  width: 80,
+                                  decoration: BoxDecoration(
+                                    color: white,
+                                    boxShadow: [
+                                      BoxShadow(
+                                          color: Colors.grey[300],
+                                          offset: Offset(1, 1),
+                                          blurRadius: 4),
+                                    ],
+                                  ),
+                                  child: Padding(
+                                    padding: EdgeInsets.all(4),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => Page1(
+                                                  dataList[index].childList)),
+                                        );
+                                      },
+                                      child: Image.network(
+                                        dataList[index].image,
+                                        width: 40,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -253,9 +258,11 @@ Future<Gagro> fetchGagro() async {
   final response = await http.get(
       'http://uat.gagro.com.bd/api/category-data'); // ?fbclid=IwAR1vj83qPGT3nu-fT8OFT5CU5N3pZOWspDVSrRvU7Q2H-pRB6oIHP2bWkOk
 
-  if (response.statusCode == 200) {
-    return Gagro.fromJson(json.decode(response.body));
-  } else {
-    throw Exception('Failed to load album');
-  }
+  try {
+    if (response.statusCode == 200) {
+      return Gagro.fromJson(json.decode(response.body));
+    } else {
+      throw Exception('Failed to load album');
+    }
+  } catch (e) {}
 }

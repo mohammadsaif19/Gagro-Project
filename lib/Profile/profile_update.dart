@@ -2,13 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:gagro/Profile/profile.dart';
 import 'package:gagro/global/global.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../Login/login.dart';
 
 class ProfileUpdate extends StatefulWidget {
   @override
@@ -64,11 +62,12 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
   update() async {
     SharedPreferences _preference = await SharedPreferences.getInstance();
     String token = _preference.getString('token');
+
     await http.post(
       "http://uat.gagro.com.bd/api/profile",
       body: {
         "name": nameController.text,
-        "email": emailController.text,
+        "email": 'demo1@mail.com',
         "phone": phoneController.text,
         "dob": dobController.text,
         "upazila_id": upazilaController.text,
@@ -95,7 +94,7 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
           ADDRESS = addressController.text,
           OCCUPTION = occuptionController.text,
           EDUCATION = educationController.text,
-          UPAZILA = upazilaController.text,
+          UPAZILA = upazilaController.text
         });
 
     // print(value);
@@ -105,17 +104,14 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
     if (success == true) {
       setState(() {
         Fluttertoast.showToast(
-            msg: "Update Successfully",
+            msg: pMessage,
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
             timeInSecForIosWeb: 2,
             backgroundColor: Colors.purple,
             textColor: Colors.white,
             fontSize: 16.0);
-
-        Navigator.push(
-                context, MaterialPageRoute(builder: (context) => ProfileGet()))
-            .catchError((error) {});
+        Navigator.pop(context, true);
         print(pMessage);
       });
     } else {
@@ -159,7 +155,8 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
                   height: 100,
                   width: 100,
                   child: image == null
-                      ? Image.asset("assets/images/man.png")
+                      ? Image.network(
+                          "https://png.pngtree.com/png-clipart/20190614/original/pngtree-man-vector-icon-png-image_3791374.jpg")
                       : Image.file(image),
                 ),
               ),
@@ -192,9 +189,6 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
                 height: 20,
               ),
 
-              SizedBox(
-                height: 20.0,
-              ),
               Padding(
                 padding: const EdgeInsets.only(left: 30, right: 30),
                 child: TextFormField(
@@ -219,29 +213,6 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
               ),
               SizedBox(
                 height: 20.0,
-              ),
-
-              Padding(
-                padding: const EdgeInsets.only(left: 30, right: 30),
-                child: TextFormField(
-                  controller: emailController,
-                  validator: (value) {
-                    if (value.isEmpty) {
-                      return 'please enter Email ';
-                    }
-                    return null;
-                  },
-                  decoration: InputDecoration(
-                      enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(8)),
-                          borderSide: BorderSide(color: Colors.grey[200])),
-                      focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(8)),
-                          borderSide: BorderSide(color: Colors.grey[300])),
-                      filled: true,
-                      fillColor: Colors.grey[100],
-                      hintText: "Email"),
-                ),
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 30, right: 30),

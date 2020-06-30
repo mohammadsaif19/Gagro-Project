@@ -1,11 +1,9 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gagro/Api/api.dart';
 import 'package:gagro/Constent/constant.dart';
-import 'package:gagro/Home/home.dart';
 import 'package:gagro/Login/login.dart';
 import 'package:gagro/global/global.dart';
 import 'package:http/http.dart' as http;
@@ -130,8 +128,7 @@ class _SignUpState extends State<SignUp> {
         isLoading = false;
       });
       print(pMessage);
-      _showDialog(
-          context, errorMessage, "Error"); //  eikhe kisu korte hbe ki???
+      _showDialog(context, errorMessage, "Error");
     }
   }
 

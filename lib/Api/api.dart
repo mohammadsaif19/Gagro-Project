@@ -15,6 +15,7 @@ class BaseURL {
       "http://uat.gagro.com.bd/api/category-data";
 
   static String profileUpdate = "http://uat.gagro.com.bd/api/profile";
+  static String profile = "http://uat.gagro.com.bd/api/profile";
 
   static String userVeri = "http://uat.gagro.com.bd/api/user-verification";
 }

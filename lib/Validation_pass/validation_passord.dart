@@ -97,25 +97,6 @@ class _ValidationPassWordState extends State<ValidationPassWord> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-//              TextFormField(
-//                controller: mailController,
-//                keyboardType: TextInputType.emailAddress,
-//                onSaved: (e) => email = e,
-//                decoration: InputDecoration(
-//                    enabledBorder: OutlineInputBorder(
-//                      borderRadius: BorderRadius.all(Radius.circular(8)),
-//                    ),
-//                    focusedBorder: OutlineInputBorder(
-//                      borderRadius: BorderRadius.all(Radius.circular(8)),
-//                    ),
-//                    prefixIcon: Icon(
-//                      Icons.phone,
-//                      color: Colors.black54,
-//                    ),
-//                    filled: true,
-//                    fillColor: Colors.grey[100],
-//                    hintText: "Phone"),
-//              ),
               SizedBox(
                 height: 20,
               ),
