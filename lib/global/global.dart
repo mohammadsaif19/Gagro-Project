@@ -9,3 +9,4 @@ String EDUCATION = "";
 String OTPEMAIL = "";
 String IMAGE = "";
 String UPAZILA = "";
+int QUANTITY = 0;

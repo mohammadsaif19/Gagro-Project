@@ -3,11 +3,12 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gagro/Api/api.dart';
+import 'package:gagro/Profile/profile_update.dart';
 import 'package:gagro/global/global.dart';
+import 'package:gagro/utils/custom_textStyle.dart';
+import 'package:gagro/utils/customer_color.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'profile_update.dart';
 
 class ProfileGet extends StatefulWidget {
   @override
@@ -41,8 +42,6 @@ class _ProfileGetState extends State<ProfileGet> {
         UPAZILA = user["upazila"];
       });
     }
-    //var p = user["name"];
-    // debugPrint('$user');
   }
 
   final addressController = TextEditingController();
@@ -74,14 +73,14 @@ class _ProfileGetState extends State<ProfileGet> {
             },
             icon: Icon(
               Icons.edit,
-              color: Colors.black,
+              color: Colors.white,
             ),
             label: Text(
               "Edit Profile",
               style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
             ),
           ),
         ],
@@ -100,24 +99,48 @@ class _ProfileGetState extends State<ProfileGet> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: GestureDetector(
-                          onTap: () {
-                            print("Abir");
-                          },
-                          child: Container(
-                            width: 100,
-                            height: 100,
-                            decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                image: DecorationImage(
-                                  fit: BoxFit.fill,
-                                  image: NetworkImage(
-                                      "https://png.pngtree.com/png-clipart/20190614/original/pngtree-man-vector-icon-png-image_3791374.jpg"),
-                                )),
+                      Stack(
+                        children: <Widget>[
+                          Align(
+                            alignment: Alignment.center,
+                            child: Container(
+                              width: 120,
+                              height: 120,
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: LinearGradient(colors: [
+                                    CustomColors
+                                        .EDIT_PROFILE_PIC_FIRST_GRADIENT,
+                                    CustomColors
+                                        .EDIT_PROFILE_PIC_SECOND_GRADIENT
+                                  ])),
+                            ),
                           ),
-                        ),
+                          Align(
+                            alignment: Alignment.center,
+                            child: Container(
+                              width: 120,
+                              height: 120,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  IconButton(
+                                      icon: Icon(
+                                        Icons.image,
+                                        color: Colors.white,
+                                      ),
+                                      onPressed: () {}),
+                                  Text(
+                                    "Choose Image",
+                                    style: CustomTextStyle.textFormFieldMedium
+                                        .copyWith(
+                                            color: Colors.white, fontSize: 12),
+                                  )
+                                ],
+                              ),
+                            ),
+                          )
+                        ],
                       ),
                       SizedBox(
                         height: 8,
@@ -130,11 +153,16 @@ class _ProfileGetState extends State<ProfileGet> {
                       SizedBox(
                         height: 8,
                       ),
+                      Text(
+                        "Email: $EMAIL",
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
                       SizedBox(
                         height: 13,
                       ),
                       Text(
-                        "Name: $PHONE",
+                        "Phone: $PHONE",
                         style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
@@ -143,85 +171,69 @@ class _ProfileGetState extends State<ProfileGet> {
                 ),
               ),
             ),
-            SizedBox(
-              height: 20,
+            Container(
+              child: TextFormField(
+                controller: dobController,
+                keyboardType: TextInputType.text,
+                decoration: InputDecoration(
+                  contentPadding: EdgeInsets.all(12),
+                  border: border,
+                  hintText: "Dob",
+                  focusedBorder: border.copyWith(
+                      borderSide: BorderSide(color: Colors.blue)),
+                ),
+              ),
+              margin: EdgeInsets.only(left: 12, right: 12, top: 24),
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 30, right: 30),
+            Container(
+              child: TextFormField(
+                controller: occuptionController,
+                keyboardType: TextInputType.text,
+                decoration: InputDecoration(
+                  contentPadding: EdgeInsets.all(12),
+                  border: border,
+                  hintText: "Occuption",
+                  focusedBorder: border.copyWith(
+                      borderSide: BorderSide(color: Colors.blue)),
+                ),
+              ),
+              margin: EdgeInsets.only(left: 12, right: 12, top: 24),
+            ),
+            Container(
               child: TextFormField(
                 controller: educationController,
+                keyboardType: TextInputType.text,
                 decoration: InputDecoration(
-                    enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(8)),
-                        borderSide: BorderSide(color: Colors.grey[200])),
-                    focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(8)),
-                        borderSide: BorderSide(color: Colors.grey[300])),
-                    filled: true,
-                    fillColor: Colors.grey[100],
-                    hintText: "Upazila_Id"),
+                  contentPadding: EdgeInsets.all(12),
+                  border: border,
+                  hintText: "Education",
+                  focusedBorder: border.copyWith(
+                      borderSide: BorderSide(color: Colors.blue)),
+                ),
               ),
+              margin: EdgeInsets.only(left: 12, right: 12, top: 24),
             ),
-            SizedBox(
-              height: 30,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 30, right: 30),
+            Container(
               child: TextFormField(
-                controller: educationController,
+                controller: addressController,
+                keyboardType: TextInputType.text,
                 decoration: InputDecoration(
-                    enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(8)),
-                        borderSide: BorderSide(color: Colors.grey[200])),
-                    focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(8)),
-                        borderSide: BorderSide(color: Colors.grey[300])),
-                    filled: true,
-                    fillColor: Colors.grey[100],
-                    hintText: "Address"),
+                  contentPadding: EdgeInsets.all(12),
+                  border: border,
+                  hintText: "Address",
+                  focusedBorder: border.copyWith(
+                      borderSide: BorderSide(color: Colors.blue)),
+                ),
               ),
-            ),
-            SizedBox(
-              height: 30,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 30, right: 30),
-              child: TextFormField(
-                controller: educationController,
-                decoration: InputDecoration(
-                    enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(8)),
-                        borderSide: BorderSide(color: Colors.grey[200])),
-                    focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(8)),
-                        borderSide: BorderSide(color: Colors.grey[300])),
-                    filled: true,
-                    fillColor: Colors.grey[100],
-                    hintText: "Occuption"),
-              ),
-            ),
-            SizedBox(
-              height: 30,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 30, right: 30, bottom: 30),
-              child: TextFormField(
-                controller: educationController,
-                decoration: InputDecoration(
-                    enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(8)),
-                        borderSide: BorderSide(color: Colors.grey[200])),
-                    focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(8)),
-                        borderSide: BorderSide(color: Colors.grey[300])),
-                    filled: true,
-                    fillColor: Colors.grey[100],
-                    hintText: "Education"),
-              ),
+              margin: EdgeInsets.only(left: 12, right: 12, top: 24),
             ),
           ],
         ),
       ),
     );
   }
+
+  var border = OutlineInputBorder(
+      borderRadius: BorderRadius.all(Radius.circular(4)),
+      borderSide: BorderSide(width: 1, color: Colors.grey));
 }

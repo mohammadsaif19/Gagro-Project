@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gagro/Cart/cart_screen.dart';
 
 class BottomBar extends StatelessWidget {
   @override
@@ -36,7 +37,15 @@ class BottomBar extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
                           Icon(Icons.search, color: Color(0xFF676E79)),
-                          Icon(Icons.shopping_basket, color: Color(0xFF676E79))
+                          IconButton(
+                              icon: Icon(Icons.shopping_basket,
+                                  color: Color(0xFF676E79)),
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => CartPage()));
+                              })
                         ],
                       )),
                 ])));

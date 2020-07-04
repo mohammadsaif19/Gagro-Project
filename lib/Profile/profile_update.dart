@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gagro/global/global.dart';
+import 'package:gagro/utils/custom_textStyle.dart';
+import 'package:gagro/utils/customer_color.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -33,6 +35,12 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
 
   File image;
 
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  _showMsg(msg) {
+    final snackBar = SnackBar(content: Text(msg));
+    _scaffoldKey.currentState.showSnackBar(snackBar);
+  }
+
   gallery() async {
     // ignore: deprecated_member_use
     var _image = await ImagePicker.pickImage(source: ImageSource.gallery);
@@ -62,12 +70,27 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
   update() async {
     SharedPreferences _preference = await SharedPreferences.getInstance();
     String token = _preference.getString('token');
-
+    /*   var uri = Uri.parse("http://uat.gagro.com.bd/api/profile");
+    var request = http.MultipartRequest('POST', uri)
+      ..fields['name'] = nameController.text
+      ..fields['email'] = emailController.text
+      ..fields['phone'] = phoneController.text
+      ..fields['dob'] = dobController.text
+      ..fields['upazila_id'] = upazilaController.text
+      ..fields['address'] = addressController.text
+      ..fields['occupation'] = occuptionController.text
+      ..fields['education'] = educationController.text;
+      /*
+      ..files.add(await http.MultipartFile.fromPath(
+          'package', 'build/package.tar.gz',
+          contentType: MediaType('application', 'x-tar')));*/
+    var response = await request.send()
+   if (response.statusCode == 200) print('Uploaded!');*/
     await http.post(
       "http://uat.gagro.com.bd/api/profile",
       body: {
         "name": nameController.text,
-        "email": 'demo1@mail.com',
+        "email": emailController.text,
         "phone": phoneController.text,
         "dob": dobController.text,
         "upazila_id": upazilaController.text,
@@ -97,10 +120,6 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
           UPAZILA = upazilaController.text
         });
 
-    // print(value);
-
-    // = data["message"];
-
     if (success == true) {
       setState(() {
         Fluttertoast.showToast(
@@ -118,6 +137,7 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
       setState(() {
         isLoading = false;
       });
+      _showMsg(data["errors"]["phone"]);
     }
   }
 
@@ -134,13 +154,11 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
     super.initState();
   }
 
-  //get isEditNote => widget != null;
-
   @override
   Widget build(BuildContext context) {
     String _formattedate = new DateFormat.yMMMMEEEEd().format(date);
     return Scaffold(
-      //      backgroundColor: Colors.cyan[200],
+      key: _scaffoldKey,
       body: SafeArea(
         child: Form(
           key: _key,
@@ -149,16 +167,45 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
               SizedBox(
                 height: 30,
               ),
-              InkWell(
-                onTap: gallery,
-                child: Container(
-                  height: 100,
-                  width: 100,
-                  child: image == null
-                      ? Image.network(
-                          "https://png.pngtree.com/png-clipart/20190614/original/pngtree-man-vector-icon-png-image_3791374.jpg")
-                      : Image.file(image),
-                ),
+              Stack(
+                children: <Widget>[
+                  Align(
+                    alignment: Alignment.center,
+                    child: Container(
+                      width: 120,
+                      height: 120,
+                      decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(colors: [
+                            CustomColors.EDIT_PROFILE_PIC_FIRST_GRADIENT,
+                            CustomColors.EDIT_PROFILE_PIC_SECOND_GRADIENT
+                          ])),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.center,
+                    child: Container(
+                      width: 120,
+                      height: 120,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          IconButton(
+                              icon: Icon(
+                                Icons.image,
+                                color: Colors.white,
+                              ),
+                              onPressed: () {}),
+                          Text(
+                            "Choose Image",
+                            style: CustomTextStyle.textFormFieldMedium
+                                .copyWith(color: Colors.white, fontSize: 12),
+                          )
+                        ],
+                      ),
+                    ),
+                  )
+                ],
               ),
               SizedBox(
                 height: 20,
@@ -188,7 +235,31 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
               SizedBox(
                 height: 20,
               ),
-
+              Padding(
+                padding: const EdgeInsets.only(left: 30, right: 30),
+                child: TextFormField(
+                  controller: emailController,
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'please enter Email ';
+                    }
+                    return null;
+                  },
+                  decoration: InputDecoration(
+                      enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(8)),
+                          borderSide: BorderSide(color: Colors.grey[200])),
+                      focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(8)),
+                          borderSide: BorderSide(color: Colors.grey[300])),
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                      hintText: "Email"),
+                ),
+              ),
+              SizedBox(
+                height: 20.0,
+              ),
               Padding(
                 padding: const EdgeInsets.only(left: 30, right: 30),
                 child: TextFormField(
@@ -221,7 +292,7 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
                     DateTime picked = await showDatePicker(
                         context: context,
                         initialDate: DateTime.now(),
-                        firstDate: DateTime(2020),
+                        firstDate: DateTime(1990),
                         lastDate: DateTime(2021));
                     dobController.text = _formattedate.toString();
                     if (picked != null && picked != date) {
@@ -262,45 +333,9 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
                       hintText: "Occution"),
                 ),
               ),
-
               SizedBox(
                 height: 20.0,
               ),
-//              Padding(
-//                padding: const EdgeInsets.all(30.0),
-//                child: FormField<String>(
-//                  builder: (FormFieldState<String> state) {
-//                    return InputDecorator(
-//                      decoration: InputDecoration(
-//                          errorStyle: TextStyle(
-//                              color: Colors.redAccent, fontSize: 16.0),
-//                          hintText: 'Please select expense',
-//                          border: OutlineInputBorder(
-//                              borderRadius: BorderRadius.circular(5.0))),
-//                      isEmpty: _currentSelectedValue == '',
-//                      child: DropdownButtonHideUnderline(
-//                        child: DropdownButton<String>(
-//                          hint: Text("Select a Gender.."),
-//                          value: _currentSelectedValue,
-//                          isDense: true,
-//                          onChanged: (String newValue) {
-//                            setState(() {
-//                              _currentSelectedValue = newValue;
-//                              state.didChange(newValue);
-//                            });
-//                          },
-//                          items: genderType.map((String value) {
-//                            return DropdownMenuItem<String>(
-//                              value: value,
-//                              child: Text(value),
-//                            );
-//                          }).toList(),
-//                        ),
-//                      ),
-//                    );
-//                  },
-//                ),
-//              ),
               Padding(
                 padding: const EdgeInsets.only(left: 30, right: 30),
                 child: TextFormField(
@@ -339,7 +374,6 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
               SizedBox(
                 height: 30,
               ),
-
               Padding(
                 padding: const EdgeInsets.only(left: 90, right: 90, bottom: 30),
                 child: Container(

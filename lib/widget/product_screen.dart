@@ -1,23 +1,92 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gagro/Constent/constant.dart';
 import 'package:gagro/Product_List/product_list_model.dart';
 import 'package:gagro/screens/product_details.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
-class ProductScreen extends StatefulWidget {
+class AllProductScreen extends StatefulWidget {
   @override
-  _ProductScreenState createState() => _ProductScreenState();
+  _AllProductScreenState createState() => _AllProductScreenState();
 }
 
-class _ProductScreenState extends State<ProductScreen> {
+class _AllProductScreenState extends State<AllProductScreen> {
   bool isFavorite = false;
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  Future addToCart(int productId, int quantity) async {
+    SharedPreferences _preference = await SharedPreferences.getInstance();
+    String token = _preference.getString('token');
+    var response =
+        await http.post("http://uat.gagro.com.bd/api/cart", headers: {
+      "Accept": "application/json",
+      HttpHeaders.authorizationHeader: "Bearer $token"
+    }, body: {
+      "product_id": productId.toString(),
+      "quantity": quantity.toString(),
+    });
+
+    final addCartdata = json.decode(response.body);
+    print(addCartdata);
+
+    bool success = addCartdata["Success"];
+
+    if (success == true) {
+      Fluttertoast.showToast(
+          msg: "Added product Successfully",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 2,
+          backgroundColor: Colors.greenAccent,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    } else {
+      Fluttertoast.showToast(
+          msg: "error occoured :(",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 2,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }
+  }
+
+  bool _addToCartClicked = false;
+
+  int _counter = 5;
+
+  void _increaseCartItem() {
+    setState(() {
+      _counter++;
+    });
+  }
+
+  void _decreaseCartItem() {
+    if (_counter <= 5) {
+      final snackBar = SnackBar(
+        backgroundColor: Colors.redAccent,
+        content: Text("Minimum product order is 5"),
+      );
+      _scaffoldKey.currentState.showSnackBar(snackBar);
+    } else {
+      setState(() {
+        _counter--;
+      });
+    }
+  }
+
+  int totalProduct;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         backgroundColor: Colors.redAccent,
         centerTitle: true,
@@ -50,7 +119,7 @@ class _ProductScreenState extends State<ProductScreen> {
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
                     child: Text(
-                      "20 Products found",
+                      "$totalProduct Products found",
                       style: TextStyle(
                         color: Colors.black87,
                         letterSpacing: 0.5,
@@ -68,13 +137,6 @@ class _ProductScreenState extends State<ProductScreen> {
                         size: 20,
                       ),
                       onPressed: null),
-                  IconButton(
-                      icon: Icon(
-                        Icons.filter_list,
-                        color: Colors.black87,
-                        size: 20,
-                      ),
-                      onPressed: null),
                 ],
               ),
             ),
@@ -82,7 +144,7 @@ class _ProductScreenState extends State<ProductScreen> {
               height: 15,
             ),
             Container(
-              height: MediaQuery.of(context).size.height,
+              height: MediaQuery.of(context).size.height - 130,
               child: _productScreenTile(),
             )
           ],
@@ -97,6 +159,7 @@ class _ProductScreenState extends State<ProductScreen> {
       builder: (BuildContext context, AsyncSnapshot<Catalog> snapshot) {
         if (snapshot.hasData) {
           final dataList = snapshot.data.data.dataList;
+
           return GridView.builder(
             scrollDirection: Axis.vertical,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -226,25 +289,68 @@ class _ProductScreenState extends State<ProductScreen> {
                             ],
                           ),
                         ),
-                        Container(
-                          height: 25,
-                          width: 100,
-                          child: RaisedButton(
-                            color: Colors.redAccent,
-                            shape: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.redAccent),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            onPressed: () {},
-                            child: Text(
-                              "+ ADD",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
+                        _addToCartClicked
+                            ? Container(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () => _decreaseCartItem(),
+                                      child: Icon(
+                                        Icons.remove_circle,
+                                        color: Colors.redAccent,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                      "$_counter",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    GestureDetector(
+                                      onTap: () => _increaseCartItem(),
+                                      child: Icon(Icons.add_circle,
+                                          color: Colors.redAccent),
+                                    ),
+                                    SizedBox(
+                                      width: 20,
+                                    )
+                                  ],
+                                ),
+                              )
+                            : Container(
+                                height: 25,
+                                width: 100,
+                                child: RaisedButton(
+                                  color: Colors.redAccent,
+                                  shape: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.redAccent),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  onPressed: () {
+                                    addToCart(dataList[index].id, _counter);
+                                    setState(() {
+                                      _addToCartClicked = true;
+                                    });
+                                  },
+                                  child: Text(
+                                    "+ ADD",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                        ),
                         Container(
                           padding: EdgeInsets.zero,
                           alignment: Alignment.center,

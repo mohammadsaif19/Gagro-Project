@@ -1,8 +1,15 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_pro/carousel_pro.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gagro/Product_List/product_list_model.dart';
+import 'package:gagro/global/global.dart';
 import 'package:html/parser.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class ProductDetailsScreen extends StatefulWidget {
   final DataList productObject;
@@ -14,10 +21,81 @@ class ProductDetailsScreen extends StatefulWidget {
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   bool _addCartClicked = false;
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  Future addToCart(int productId, int quantity) async {
+    SharedPreferences _preference = await SharedPreferences.getInstance();
+    String token = _preference.getString('token');
+    debugPrint("$quantity");
+    var response =
+        await http.post("http://uat.gagro.com.bd/api/cart", headers: {
+      "Accept": "application/json",
+      HttpHeaders.authorizationHeader: "Bearer $token"
+    }, body: {
+      "product_id": productId.toString(),
+      "quantity": quantity.toString(),
+    });
+
+    final addCartdata = json.decode(response.body);
+    print(addCartdata);
+
+    bool success = addCartdata["Success"];
+
+    if (success == true) {
+      Fluttertoast.showToast(
+          msg: "Added product Successfully",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 2,
+          backgroundColor: Colors.greenAccent,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    } else {
+      Fluttertoast.showToast(
+          msg: "error occoured :(",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 2,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }
+  }
+
+  int _counter = 5;
+
+  void _increaseCartItem() {
+    setState(() {
+      _counter++;
+      _addCartClicked = false;
+    });
+  }
+
+  void _decreaseCartItem() {
+    if (_counter <= 5) {
+      final snackBar = SnackBar(
+        backgroundColor: Colors.redAccent,
+        content: Text("Minimum product order is 5"),
+      );
+      _scaffoldKey.currentState.showSnackBar(snackBar);
+    } else {
+      setState(() {
+        _counter--;
+      });
+    }
+  }
+
+  static removeTag({htmlString, callback}) {
+    var document = parse(htmlString);
+    String parsedString = parse(document.body.text).documentElement.text;
+    callback(parsedString);
+    return parsedString;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         elevation: 0,
         centerTitle: true,
@@ -40,9 +118,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         ],
       ),
       body: SingleChildScrollView(
-        child: DetailScreen(
-          productObject: widget.productObject,
-        ),
+        child: _detailsScreenTile(),
       ),
       bottomNavigationBar: Container(
         height: 60,
@@ -57,9 +133,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             borderRadius: BorderRadius.circular(10),
           ),
           onPressed: () {
-            setState(() {
-              _addCartClicked = true;
-            });
+            if (_addCartClicked != true) {
+              addToCart(widget.productObject.id, _counter);
+              setState(() {
+                _addCartClicked = true;
+              });
+            }
+            return null;
           },
           child: Text(
             _addCartClicked
@@ -75,48 +155,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       ),
     );
   }
-}
 
-class DetailScreen extends StatefulWidget {
-  final DataList productObject;
-  DetailScreen({
-    Key key,
-    this.productObject,
-  }) : super(key: key);
-
-  @override
-  _DetailScreenState createState() => _DetailScreenState();
-}
-
-class _DetailScreenState extends State<DetailScreen> {
-  int _counter = 0;
-  bool _addCartClicked = false;
-
-  void _increaseCartItem() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  void _decreaseCartItem() {
-    if (_counter < 1) {
-      return null;
-    } else {
-      setState(() {
-        _counter--;
-      });
-    }
-  }
-
-  static removeTag({htmlString, callback}) {
-    var document = parse(htmlString);
-    String parsedString = parse(document.body.text).documentElement.text;
-    callback(parsedString);
-    return parsedString;
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _detailsScreenTile() {
     return SingleChildScrollView(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -309,7 +349,6 @@ class _DetailsImageSliderState extends State<DetailsImageSlider>
             boxFit: BoxFit.fill,
             images: [
               CachedNetworkImage(imageUrl: widget.productObject.image1),
-              CachedNetworkImage(imageUrl: widget.productObject.image2),
             ],
             animationCurve: Curves.fastOutSlowIn,
             animationDuration: Duration(seconds: 1),

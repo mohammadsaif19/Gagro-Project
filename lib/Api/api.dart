@@ -18,6 +18,8 @@ class BaseURL {
   static String profile = "http://uat.gagro.com.bd/api/profile";
 
   static String userVeri = "http://uat.gagro.com.bd/api/user-verification";
+
+  static String getCart = "http://uat.gagro.com.bd/api/cart";
 }
 
 /// Default login credentials:
