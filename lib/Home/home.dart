@@ -1,8 +1,11 @@
 import 'dart:convert';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gagro/Api/api.dart';
 import 'package:gagro/BottomBar/bottom_bar.dart';
+import 'package:gagro/Cart/cart_screen.dart';
 import 'package:gagro/Constent/constant.dart';
 import 'package:gagro/Login/login.dart';
 import 'package:gagro/Product_List/product_list.dart';
@@ -24,6 +27,88 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  int pageIndex = 0;
+
+  final HomeScreen _homeScreen = HomeScreen();
+  final CartPage _cartPage = CartPage();
+  final AllProductScreen _allProductScreen = AllProductScreen();
+  final ProfileGet _profileGet = ProfileGet();
+
+  Widget _showPage = HomeScreen();
+
+  Widget _pageController(int page) {
+    switch (page) {
+      case 0:
+        return _homeScreen;
+        break;
+      case 1:
+        return _cartPage;
+        break;
+      case 2:
+        return _allProductScreen;
+        break;
+      case 3:
+        return _profileGet;
+        break;
+
+      default:
+        return _homeScreen;
+        break;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      bottomNavigationBar: CurvedNavigationBar(
+        color: Colors.cyan,
+        backgroundColor: Colors.white24,
+        buttonBackgroundColor: Colors.cyan,
+        height: 50,
+        animationDuration: Duration(milliseconds: 400),
+        index: 0,
+        items: <Widget>[
+          Icon(
+            Icons.home,
+            size: 20,
+            color: Colors.white,
+          ),
+          Icon(
+            Icons.shopping_cart,
+            size: 20,
+            color: Colors.white,
+          ),
+          Icon(
+            Icons.local_offer,
+            size: 20,
+            color: Colors.white,
+          ),
+          Icon(
+            FontAwesomeIcons.user,
+            size: 18,
+            color: Colors.white,
+          ),
+        ],
+        onTap: (int index) {
+          setState(() {
+            _showPage = _pageController(index);
+          });
+        },
+      ),
+      drawer: CustomDrawer(),
+      body: _showPage,
+    );
+  }
+}
+
+class HomeScreen extends StatefulWidget {
+  HomeScreen({Key key}) : super(key: key);
+
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   _onSelect(PageEnum value) {
     switch (value) {
       case PageEnum.profilePage:
@@ -93,14 +178,6 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        backgroundColor: Color(0xFFF17532),
-        child: Icon(Icons.sentiment_very_satisfied),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: BottomBar(),
-      drawer: CustomDrawer(),
       body: ListView(
         children: <Widget>[
           Card(
